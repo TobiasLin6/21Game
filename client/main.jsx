@@ -1,5 +1,8 @@
 // Import the SDK
 import { DiscordSDK } from "@discord/embedded-app-sdk";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./components/App";
 
 import "./styles.css";
 
@@ -14,9 +17,9 @@ async function setupDiscordSdk() {
   await discordSdk.ready();
 }
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <h1>Hello, World!</h1>
-    <h1>This is test 2</h1>
-  </div>
-`;
+const root = ReactDOM.createRoot(document.getElementById('app'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
