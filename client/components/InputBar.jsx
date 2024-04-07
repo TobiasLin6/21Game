@@ -1,13 +1,14 @@
 import React from 'react';
 
 function InputBar(props) {
-
-    function handleChange(event) {
-        props.setsolution(event.target.value);
-    }
-
     return (
-        <input type="text" id="solution-bar" placeholder="solution" onChange={handleChange} value={props.value} />
+        <div 
+            id="solution-bar" 
+            contentEditable 
+            suppressContentEditableWarning
+        >
+            <span style={{color: "gray"}}>{props.start}</span><span>{props.value}</span><span style={{color: "gray"}}>{props.end}</span>
+        </div>
     )
 }
 
