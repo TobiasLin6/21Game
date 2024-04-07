@@ -4,7 +4,7 @@ import fetch from "node-fetch";
 dotenv.config({ path: "../.env" });
 
 const app = express();
-const port = 3001;
+const port = 3000;
 
 // Allow express to parse JSON bodies
 app.use(express.json());
