@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Numbers from './Numbers';
 import Refresh from './Refresh';
 import InputBar from './InputBar';
+import { Calc } from '../functions/Calc';
 
 const ops = ['+', '-', '*', '/'];
 const par = ['(', ')'];
@@ -24,8 +25,6 @@ function App() {
     const [start, setStart] = useState('');
     const [end, setEnd] = useState('');
 
-    let disabled = {};
-
     let random = Math.random()
     function randInt() {
         return Math.floor(Math.random() * 10) + 1;
@@ -47,9 +46,6 @@ function App() {
             }
             
         });
-
-        // TODO: Set disable buttons
-
 
         // Handle operations
         document.getElementById("add").addEventListener('click', function () {
@@ -98,21 +94,20 @@ function App() {
         });
         document.getElementById("lpar").addEventListener('click', function () {
             setSolution(prev => {
-                if (par.includes(prev.slice(-1))) {
-                    return prev.slice(0, -1) + "(";
-                } else {
-                    return prev + "(";
-                }
+                const [newStart, newEnd] = checkParenthesis(prev + "(");
+                setStart(newStart);
+                setEnd(newEnd);
+                return prev + "("
             });
-            setEnd(prev => prev + ")");
         });
         document.getElementById("rpar").addEventListener('click', function () {
             setSolution(prev => {
-                if (ops.includes(prev.slice(-1))) {
+                if (ops.includes(prev.slice(-1)) || prev.slice(-1) === "(") {
                     return prev
-                } else if (prev.slice(-1) === "(") {
-                    return prev;
                 } else {
+                    const [newStart, newEnd] = checkParenthesis(prev + ")");
+                    setStart(newStart);
+                    setEnd(newEnd);
                     return prev + ")";
                 }
             });
@@ -120,57 +115,36 @@ function App() {
 
     };
 
-
-    //TODO: Fix this. start & end always read as 0 b/c they didn't get rerendered yet
-    function checkParenthesis() {
+    //TODO: Fix this for the edge case of )(
+    function checkParenthesis(input) {
         let numLeft = 0;
-                    let numRight = 0;
-                    for (let i = 0; i < prev.length; i++) {
-                        if (prev.slice(i) === "(") {
-                            numLeft++;
-                        } else if (prev.slice(i) === ")") {
-                            numRight++;
-                        }
-                    }
-                    for (let i = 0; i < start.length; i++) {
-                        if (start.slice(i) === "(") {
-                            numLeft++;
-                        } else if (start.slice(i) === ")") {
-                            numRight++;
-                        }
-                    }
-                    for (let i = 0; i < end.length; i++) {
-                        if (end.slice(i) === "(") {
-                            numLeft++;
-                        } else if (end.slice(i) === ")") {
-                            numRight++;
-                        }
-                    }
-                    console.log(`left: ${numLeft} right: ${numRight}`)
+        let numRight = 0;
+        for (let i = 0; i < input.length; i++) {
+            if (input[i] === "(") {
+                numLeft++;
+            } else if (input[i] === ")") {
+                numRight++;
+            }
+        }
+        console.log(`left: ${numLeft} right: ${numRight}`)
 
-                    if (numLeft === numRight + 1) {
-                        console.log("1");
-                        setStart("");
-                    } else if (numLeft < numRight + 1) {
-                        console.log("2");
-                        setStart("(".repeat((numRight + 1 - numLeft)));
-                    } else {
-                        console.log("3");
-                        setStart("(".repeat((numLeft - numRight + 1)));
-                    }
-                        
-                    return prev + ")";
+        if (numLeft === numRight) {
+            console.log("1");
+            return ["", ""];
+        } else if (numLeft < numRight) {
+            console.log("2");
+            return ["(".repeat((numRight - numLeft)), ""];
+        } else {
+            console.log("3");
+            return ["", ")".repeat((numLeft - numRight))];
+        }
     }
 
     // TODO: Check UI
     function handleUI() {
 
     }
-
-    // TODO: Make calculator component & function
-    function calc() {
-
-    }
+    
 
     // TODO: Set function. Can call calc(). Make submit button component.
     function checkAns() {
@@ -180,19 +154,19 @@ function App() {
     return (
         <main>
             <h1>21 Game Prototype 1</h1>
-            <Numbers btnclicked={btnClicked} elementId="1" val={val1} />
-            <Numbers btnclicked={btnClicked} elementId="2" val={val2} />
-            <Numbers btnclicked={btnClicked} elementId="3" val={val3} />
-            <Numbers btnclicked={btnClicked} elementId="4" val={val4} />
+            <Numbers btnclicked={btnClicked} elementId="1" val={val1} disablebtn={setDisable1} disable={disable1} />
+            <Numbers btnclicked={btnClicked} elementId="2" val={val2} disablebtn={setDisable2} disable={disable2} />
+            <Numbers btnclicked={btnClicked} elementId="3" val={val3} disablebtn={setDisable3} disable={disable3} />
+            <Numbers btnclicked={btnClicked} elementId="4" val={val4} disablebtn={setDisable4} disable={disable4} />
 
             <Refresh />
 
-            <InputBar value={solution} start={start} end={end}/>
+            <InputBar vals={vals} value={solution} setvalue={ setSolution } calc={Calc(start + solution + end)} start={start} end={end} disable1={setDisable1} disable2={setDisable2} disable3={setDisable3} disable4={setDisable4} />
 
         </main>
         
-    )
+    ) 
 }
-
+// start + solution + end
 
 export default App;
